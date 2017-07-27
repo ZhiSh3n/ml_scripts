@@ -1,6 +1,8 @@
+# we are going to write our own classifier to work with the iris dataset
+# inspired by google developer's machine learning recipes #5
 from scipy.spatial import distance
 
-# a function that returns the distance between two points
+# function that returns the distance between two points
 def euc(a,b):
     return distance.euclidean(a,b)
 
@@ -14,6 +16,7 @@ class ScrappyKNN():
         
     def predict(self, features_test):
         # make a predictions array
+        # this is where we are going to store the labels for each feature of the test set
         predictions = []
         # for every feature in the test set,
         # the label we predict is defined by the closest label
@@ -37,11 +40,12 @@ class ScrappyKNN():
         return self.labels_train[best_index]
     
 
-# let's write a classifier!
+# import the iris dataset
 from sklearn import datasets
 iris = datasets.load_iris()
 
 # think of a classifier as a function f(x) = y
+# we have features and we have the labels
 features = iris.data
 labels = iris.target
 
@@ -50,7 +54,7 @@ labels = iris.target
 from sklearn.model_selection import train_test_split
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = .5)
 
-# create the classifier
+# here are two other classifiers we can also use but they are pre-written
 """
 # this is one way of creating a classifier - it is a decision tree
 from sklearn import tree
@@ -60,7 +64,8 @@ my_classifier = tree.DecisionTreeClassifier()
 from sklearn.neighbors import KNeighborsClassifier
 my_classifier = KNeighborsClassifier()
 """
-# let's write our own classifier!
+
+# call our own classifier
 my_classifier = ScrappyKNN()
 
 # the takeaway is that while there are many types of classifiers
