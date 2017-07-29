@@ -24,11 +24,14 @@ print("Unique elements in labels:", set(target))
 # no need to create figure
 from matplotlib import pylab
 from pylab import *
+"""
 plot(data[target=="setosa",0],data[target=="setosa",2],"bo")
 plot(data[target=='versicolor',0],data[target=='versicolor',2],'ro')
 plot(data[target=='virginica',0],data[target=='virginica',2],'go')
+"""
 
 # plot histograms
+"""
 xmin = min(data[:,0])
 xmax = max(data[:,0])
 figure() # create new window
@@ -45,6 +48,7 @@ xlim(xmin,xmax)
 subplot(414) # global histogram (4th, on the bottom)
 hist(data[:,0],color='y',alpha=.7)
 xlim(xmin,xmax)
+"""
 #show()
 
 # now we will use gaussian naive bayes to classify
@@ -52,7 +56,7 @@ xlim(xmin,xmax)
 t = zeros(len(target))
 t[target == "setosa"] = 1
 t[target == "versicolor"] = 2
-t[target == "virginicia"] = 3
+t[target == "virginica"] = 3
 
 from sklearn.naive_bayes import GaussianNB
 classifier = GaussianNB()
@@ -99,13 +103,39 @@ print(scores)
 from numpy import mean
 print(mean(scores))
 
-# clustering ???
+# clustering ???unsupervised data analysis
 from sklearn.cluster import KMeans
+# groups data in 3 clusters
 kmeans = KMeans(3,init="random")
+# assign each input to one cluster
 kmeans.fit(data)
 c = kmeans.predict(data)
 
 # evaluate results of clustering???
+# compare it with the labels we already have
 from sklearn.metrics import completeness_score, homogeneity_score
+# completeness approaches 1 when most data point are elements of the same cluster
 print(completeness_score(t,c))
+# homogeneity approaches 1 when all clusters contain only data points that are members of a single class
 print(homogeneity_score(t,c))
+
+"""
+plot(data[target=="setosa",0],data[target=="setosa",2],"bo")
+plot(data[target=='versicolor',0],data[target=='versicolor',2],'ro')
+plot(data[target=='virginica',0],data[target=='virginica',2],'go')
+"""
+# visualize this 
+#tfigure()
+subplot(211) # top figure with the real classes
+plot(data[t==2,0],data[t==2,2],'ro')
+plot(data[t==1,0],data[t==1,2],'bo')
+plot(data[t==3,0],data[t==3,2],'mo')
+
+subplot(212) # bottom figure with classes assigned automatically
+plot(data[c==1,0],data[c==1,2],'bo')
+plot(data[c==2,0],data[c==2,2],'go')
+plot(data[c==0,0],data[c==0,2],'mo')
+show()
+
+
+# regression
