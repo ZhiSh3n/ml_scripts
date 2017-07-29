@@ -1,3 +1,5 @@
+#following https://dzone.com/refcardz/data-mining-discovering-and
+
 
 # get the data
 import urllib3
@@ -8,11 +10,12 @@ with http.request('GET', url, preload_content=False) as r, open("./%s" % ("iris.
     shutil.copyfileobj(r, out_file)
 
 # organize the data
-from numpy import genfromtxt, zeros
+from numpy import *
 data = genfromtxt("iris.csv", delimiter=',',usecols=(0,1, 2, 3))
 target = genfromtxt("iris.csv", delimiter=",", usecols=(4), dtype=str)
 print("Shape of the inputs:",data.shape)
 print("Shape of the labels:", target.shape)
+# note that this is not ordered
 print("Unique elements in labels:", set(target))
 
 # visualize the data
@@ -42,7 +45,7 @@ xlim(xmin,xmax)
 subplot(414) # global histogram (4th, on the bottom)
 hist(data[:,0],color='y',alpha=.7)
 xlim(xmin,xmax)
-show()
+#show()
 
 # now we will use gaussian naive bayes to classify
 # first we will convert the vector strings in target into integers
@@ -50,3 +53,59 @@ t = zeros(len(target))
 t[target == "setosa"] = 1
 t[target == "versicolor"] = 2
 t[target == "virginicia"] = 3
+
+from sklearn.naive_bayes import GaussianNB
+classifier = GaussianNB()
+classifier.fit(data,t)
+
+# reshape data because prediction needs array that looks like training data
+# each index needs to be training example with same number of features as in training
+# ie. reshaped == ([[150, 0]])
+# non reshaped == ([150, 0])
+# data == ([[ ... ]])
+print(classifier.predict(data[0].reshape(1, -1)))
+print(t[0])
+
+# ok now we will split the set with train_test_split
+from sklearn.model_selection import train_test_split
+train, test, ttrain, ttest = train_test_split(data, t, test_size=0.4, random_state=0)
+# the size of the test is 40% the size of the original
+
+# train again
+classifier.fit(train,ttrain)
+print(classifier.score(test, ttest))
+
+
+# we can use a confusion matrix to see examine the performance of this classifier
+from sklearn.metrics import confusion_matrix
+print(confusion_matrix(classifier.predict(test),ttest))
+
+
+# or we can use classification_report which is more in depth
+from sklearn.metrics import classification_report
+print(classification_report(classifier.predict(test), ttest, target_names=["setosa", "versicolor", "virginica"]))
+
+
+
+# we can use cross validation to evaluate a classifier, which repeats the above
+# process multiple times
+
+from sklearn.model_selection import cross_val_score
+# cross validation with 6 iterations
+scores = cross_val_score(classifier, data, t, cv=6)
+print(scores)
+
+# get the mean accuracy
+from numpy import mean
+print(mean(scores))
+
+# clustering ???
+from sklearn.cluster import KMeans
+kmeans = KMeans(3,init="random")
+kmeans.fit(data)
+c = kmeans.predict(data)
+
+# evaluate results of clustering???
+from sklearn.metrics import completeness_score, homogeneity_score
+print(completeness_score(t,c))
+print(homogeneity_score(t,c))
