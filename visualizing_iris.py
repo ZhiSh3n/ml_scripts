@@ -119,13 +119,10 @@ print(completeness_score(t,c))
 # homogeneity approaches 1 when all clusters contain only data points that are members of a single class
 print(homogeneity_score(t,c))
 
-"""
-plot(data[target=="setosa",0],data[target=="setosa",2],"bo")
-plot(data[target=='versicolor',0],data[target=='versicolor',2],'ro')
-plot(data[target=='virginica',0],data[target=='virginica',2],'go')
-"""
+
 # visualize this 
-#tfigure()
+#figure() uncomment if you include the other figures above
+# remember we are plotting two of the features of the flowers on x y axis
 subplot(211) # top figure with the real classes
 plot(data[t==2,0],data[t==2,2],'ro')
 plot(data[t==1,0],data[t==1,2],'bo')
