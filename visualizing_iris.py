@@ -119,7 +119,7 @@ print(completeness_score(t,c))
 # homogeneity approaches 1 when all clusters contain only data points that are members of a single class
 print(homogeneity_score(t,c))
 
-
+"""
 # visualize this 
 #figure() uncomment if you include the other figures above
 # remember we are plotting two of the features of the flowers on x y axis
@@ -133,6 +133,60 @@ plot(data[c==1,0],data[c==1,2],'bo')
 plot(data[c==2,0],data[c==2,2],'go')
 plot(data[c==0,0],data[c==0,2],'mo')
 show()
+"""
 
 
-# regression
+# correlation: how strongly are features related?
+# we use the pearson product-moment coefficient
+from numpy import corrcoef
+corr = corrcoef(data.T) # .T gives us transpose
+print(corr)
+# rows are variables, observations are columns
+# correlation is positive when values increase together, 1 is perfect correlation
+
+# when we have a lot of variables, we can visualize the correlation matrix with
+# a pseudocolor plot
+"""
+from pylab import pcolor, colorbar, xticks, yticks
+from numpy import arange
+pcolor(corr)
+colorbar()
+xticks(arange(0.5,4.5),['sepal length',  'sepal width', 'petal length', 'petal width'],rotation=-20)
+yticks(arange(0.5,4.5),['sepal length',  'sepal width', 'petal length', 'petal width'],rotation=-20)
+show()"""
+
+# previously we were only able to visualize 2 dimensions of the iris dataset
+# we an use dimensionality reduction to have a more global view of the data
+# we will use PCA principal component analysis
+# this transforms our data into fewer uncorrelated variables called principal compoents
+from sklearn.decomposition import PCA
+pca = PCA(n_components =2)
+pcad = pca.fit_transform(data)
+"""
+plot(pcad[target=='setosa',0],pcad[target=='setosa',1],'bo')
+plot(pcad[target=='versicolor',0],pcad[target=='versicolor',1],'ro')
+plot(pcad[target=='virginica',0],pcad[target=='virginica',1],'go')
+show()
+"""
+print(pca.explained_variance_ratio_)
+# the first PC accounts for 92% of the information from the original dataset
+# second one accounts for remainng 5
+# we can see how much information we lost
+print(1-sum(pca.explained_variance_ratio_))
+
+# we can apply inverse transformation to get"original" data back
+# see how close it is
+data_inv = pca.inverse_transform(pcad)
+print(abs(sum(sum(data - data_inv))))
+
+
+
+# let's see what using a different number of principal components will do
+for i in range(1,5):
+    pca = PCA(n_components=i)
+    pca.fit(data)
+    print(sum(pca.explained_variance_ratio_) * 100,"%")
+# using just 3PC we can save almost 100% of info
+
+
+
