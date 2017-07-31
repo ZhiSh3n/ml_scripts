@@ -6,9 +6,10 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 from keras.models import load_model
+import cv2
 
 #extra
-import numpy
+import numpy as np
 from keras.models import model_from_json
 import os
 
@@ -23,10 +24,18 @@ img_cols = 28
 from keras.datasets import mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
+# let's test individually # so it looks like it is a 7
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+#plt.imshow(x_test[0])
+#plt.show()
+
+
 # reshape the data
 x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
 x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
 input_shape = (img_rows, img_cols, 1)
+
 
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
@@ -54,3 +63,13 @@ score = loaded_model.evaluate(x_test, y_test, verbose=0)
 print("%s: %.2f%%" % (loaded_model.metrics_names[1], score[1]*100))
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
+
+for filename in os.listdir("mnist_test"):
+    img = cv2.imread("mnist_test/%s" % filename)
+    img = img[:,:,0]
+    img = np.expand_dims(img,2)
+    img.shape = (1,28,28,1)
+    prediction = loaded_model.predict(img)
+    print(prediction)
+
+
