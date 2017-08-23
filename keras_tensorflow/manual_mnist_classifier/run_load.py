@@ -13,7 +13,6 @@ import numpy as np
 from keras.models import model_from_json
 import os
 
-
 # load json and create model
 json_file = open('model.json', 'r')
 loaded_model_json = json_file.read()
@@ -31,6 +30,7 @@ print("%s: %.2f%%" % (loaded_model.metrics_names[1], score[1]*100))
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
+# manually test mnist images
 for filename in os.listdir("mnist_test"):
     if filename.endswith('.png'):
         img = cv2.imread("mnist_test/%s" % filename)

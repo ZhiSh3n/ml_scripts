@@ -16,26 +16,27 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras.models import load_model
 
-# dimensions of the images
+# dimensions of mnist images
 image_width, image_height = 28, 28
 
-# data locations
+# get data path
+# this will depend on your data configuration
 PATH = os.getcwd()
-main_directory = PATH + '/mnist_png'
+main_directory = '../../../data/mnist_png_sorted'
 directory_list = os.listdir(main_directory)
 
 # training parameters
-epochs = 1
+epochs = 5
 batch_size = 128
 number_classes = 10
 #input_shape = (image_width, image_height, 1)
 
 
 # get our data
-image_data_list = []
-class_population = []
-for dataset in directory_list :
-    counter = 0
+image_data_list = [] # stores all the images
+class_population = [] # used to connect each image to a class
+for dataset in directory_list : # iterate through each dataset (folder) in directory
+    counter = 0 # counter to count how many samples are in each class
     if os.path.isdir(main_directory + '/' + dataset) :
         image_list = os.listdir(main_directory + '/' + dataset)
         print ('Loaded the images of dataset: '+'{}\n'.format(dataset))
@@ -52,7 +53,7 @@ for dataset in directory_list :
 number_samples = len(image_data_list)
 print('Total number of images loaded:', number_samples)
 
-# misc
+# image formatting
 image_data = np.array(image_data_list)
 image_data = image_data.astype('float32')
 image_data /= 255
@@ -63,8 +64,7 @@ image_data= np.expand_dims(image_data, axis=4) # adding extra dim
 # split our data
 print(class_population)
 labels = np.ones((number_samples,),dtype='int64')
-# you can probably add a for loop here
-
+# create labels for each sample
 for first_counter in range(0,10) :
     if first_counter == 0 :
         # the first class_population[0] number of samples are 0
@@ -83,6 +83,7 @@ for first_counter in range(0,10) :
         
         
 """
+# manual test data
 labels[0:class_population[0]] = 0
 labels[class_population[0]:class_population[1]] = 1
 labels[class_population[2]:class_population[3]] = 2
@@ -105,13 +106,12 @@ print(labels[59500])
 print(labels[66500])
 """
 
-names = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+# assign labels to each class to each sample
 Y = np_utils.to_categorical(labels, number_classes)
 x, y = shuffle(image_data, Y, random_state = 2)
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=2)
 X_train = X_train.reshape(X_train.shape[0], image_width, image_height, 1)
 X_test = X_test.reshape(X_test.shape[0], image_width, image_height, 1)
-
 
 # define the model
 input_shape = image_data[0].shape
@@ -145,10 +145,7 @@ print('Test accuracy:', score[1])
 """
 
 model = Sequential()
-# input: 100x100 images with 3 channels -> (3, 100, 100) tensors.
-# this applies 32 convolution filters of size 3x3 each.
 model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
-
 model.add(Conv2D(32, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 #model.add(Dropout(0.25))
@@ -157,14 +154,15 @@ model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 #model.add(Dropout(0.25))
+
 model.add(Flatten())
-# Note: Keras does automatic shape inference.
 model.add(Dense(128))
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
 model.add(Dense(number_classes))
 model.add(Activation('softmax'))
-# this is the mnist model
+
+# this is the mnist compile
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
@@ -187,5 +185,3 @@ with open("model.json", "w") as json_file:
 # serialize weights to HDF5
 model.save_weights("model.h5")
 print("Saved model to disk")
-
-
