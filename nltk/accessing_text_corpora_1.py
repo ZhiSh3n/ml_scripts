@@ -70,4 +70,75 @@ cfd.tabulate(conditions=genres, samples=modals)
 # note that the most frequent modeal in romance is could
 # the most frequent modal in news is will
 
+# inaugural address corpus
+from nltk.corpus import inaugural
+print(inaugural.fileids())
+
+# getting each year
+print([fileid[:4] for fileid in inaugural.fileids()])
+
+# look at how america and citizen are used over time
+cfd = nltk.ConditionalFreqDist(
+    (target, fileid[:4])
+    for fileid in inaugural.fileids()
+    for w in inaugural.words(fileid)
+    for target in ['america', 'citizen']
+    if w.lower().startswith(target))
+"""
+cfd.plot()
+"""
+
+# examining length differences in translated languages
+from nltk.corpus import udhr
+languages = ['Chickasaw', 'English', 'German_Deutsch', 'Greenlandic_Inuktikut',
+             'Hungarian_Magyar', 'Ibibio_Efik']
+cfd = nltk.ConditionalFreqDist(
+    (lang, len(word))
+    for lang in languages
+    for word in udhr.words(lang + '-Latin1'))
+cfd.plot(cumulative=True)
+
+# plot frequency distribution of the letters
+raw_text = udhr.raw('English-Latin1')
+nltk.FreqDist(raw_text).plot()
+
+# the basic functions of nltk are raw, words, and sents
+
+"""
+# loading your own corpus
+from nltk.corpus import PlaintextCorpurReader
+corpus_root = '/data'
+wordlists = PlaintextCorpusReader(corpus_root, '.*')
+print(wordlists.fileids()) # reads all the file names
+print(wordlists.words('filename')) # prints words in file called filename
+"""
+
+# conditional frequency distributions
+# counting words by genre
+from nltk.corpus import brown
+cfd = nltk.ConditionalFreqDist(
+    (genre, word)
+    for genre in brown.categories()
+    for word in brown.words(categories=genre))
+genre_word = [(genre, word)
+              for genre in ['news', 'romance']
+              for word in brown.words(categories=genre)]
+print(len(genre_word))
+cfd = nltk.ConditionalFreqDist(genre_word)
+print(cfd)
+print(cfd['news'])
+print(cfd['romance'])
+print(cfd['romance'].most_common(20))
+
+# limited tabulation
+from nltk.corpus import udhr
+languages = ['Chickasaw', 'English', 'German_Deutsch',
+             'Greenlandic_Inuktikut', 'Hungarian_Magyar', 'Ibibio_Efik']
+cfd = nltk.ConditionalFreqDist(
+    (lang, len(word))
+    for lang in languages
+    for word in udhr.words(lang + '-Latin1'))
+cfd.tabulate(conditions=['English', 'German_Deutsch'],
+             samples=range(10), cumulative=True)
+
 
